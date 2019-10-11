@@ -1,37 +1,43 @@
 <?php
-declare(strict_types=1);
 
 class Blackjack
 {
-    public $score;
+
     CONST MIN = 1;
     CONST MAX = 11;
+    private $score;
 
 
-    public function __construct($score) {
+    public function __construct($score, $name) {
         $this->score = $score;
+        $this->name = $name;
     }
 
     public function Hit()
     {
-        $this->score = rand(self::MIN, self::MAX);
+        $randomCard = rand(self::MIN, self::MAX);
+        echo "Card is " . $randomCard . ". ";
+        $this->score += $randomCard;
     }
 
     public function Stand()
     {
-        $this->score = $_SESSION['player'];
+        return $this->score;
     }
 
     public function Surrender()
     {
-        //return "You surrender. Dealer wins!";
+        $this->score = 0;
+        return "You surrender. " . $this->name . " loses!";
     }
 
     /**
-     * @return int
+     * @param mixed $score
      */
-    public function getScore()
+    public function setScore($score): void
     {
-        return $this->score;
+        $this->score = $score;
     }
+
+
 }
