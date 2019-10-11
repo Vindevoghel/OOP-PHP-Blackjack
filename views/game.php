@@ -7,7 +7,6 @@ error_reporting(E_ALL);
 require '../classes/Blackjack.php';
 session_start();
 
-$loseMsg = $winMsg = "";
 
 if (empty($_SESSION)) {
     $_SESSION['player'] = new Blackjack(0, "Player");
@@ -16,49 +15,22 @@ if (empty($_SESSION)) {
 
 $player = $_SESSION['player'];
 $computer = $_SESSION['computer'];
+$announcer = "";
 
 if (!empty($_POST["hit"])) {
-    $player->Hit();
+    $announcer = $player->Hit();
 }
 
 if (!empty($_POST["stand"])) {
-    while ($computer->Stand() < 15 || $computer->Stand() < $player->Stand()) {
-        $computer->Hit();
-        }
-        if ($computer->Stand() > $player->Stand() && $computer->Stand() < 21) {
-            $loseMsg = $computer->name . "'s " . $computer->Stand() . " beats " . $player->name . "'s" . $player->Stand()
-                . ". " . $player->name . " loses!";
-        } elseif ($computer->Stand() > 21) {
-            $winMsg = $computer->name . " is bust. " . $player->name . " wins!";
-        } elseif ($computer->Stand() === $player->Stand()) {
-            $winMsg = "Tie! Play again?";
-        } elseif ($computer->Stand() === 21) {
-            $loseMsg = $computer->name . " has 21. " . $player->name . " loses!";
-        } else {
-            $winMsg = $player->name . "'s " . $player->Stand() . " beats the " . $computer->name . " 's" . $computer->Stand() . ". " . $player->name . " wins!";
-        }
+    $announcer = $player->Stand($player, $computer);
 }
 
 if (!empty($_POST["surrender"])) {
-    while ($computer->Stand() < 10) {
-        $computer->Hit();
-    }
-    $loseMsg = $player->Surrender();
+    $announcer = $player->Surrender($computer);
 }
 
 if (!empty($_POST["reset"])) {
-    $loseMsg = $winMsg = "";
-    $player->setScore(0);
-    $computer->setScore(0);
-}
-if (!empty($_POST)) {
-    if ($player->Stand() > 21) {
-        $winMsg = "";
-        $loseMsg = $player->Stand() . "! Bust! " . $player->name . " loses!";
-    } else if ($player->Stand() === 21) {
-        $winMsg = "Blackjack. " . $player->name . " wins!";
-        $loseMsg = "";
-    }
+    $announcer = $player ->Reset($player, $computer);
 }
 
 
@@ -83,9 +55,9 @@ if (!empty($_POST)) {
 </form>
 
 
-<h2 id="playerScore"><?php echo $player->Stand(); ?></h2>
-<h2 id="computerScore"><?php echo $computer->Stand(); ?></h2>
-<h3 id="announcer"><?php echo $winMsg; ?><?php echo $loseMsg; ?></h3>
+<h2 id="playerScore"><?php echo $player->getScore(); ?></h2>
+<h2 id="computerScore"><?php echo $computer->getScore(); ?></h2>
+<h3 id="announcer"><?php echo $announcer; ?></h3>
 </body>
 <?php
 function whatIsHappening()
